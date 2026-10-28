@@ -4,6 +4,9 @@
 
 create type public.level_submission_status as enum ('pending','needs_evidence','accepted','rejected','withdrawn');
 
+alter table public.levels add column minimum_record_percent smallint not null default 100 check (minimum_record_percent between 1 and 100);
+alter table public.record_submissions add column raw_footage_url text check (raw_footage_url is null or raw_footage_url ~ '^https://');
+
 create table public.level_submissions (
   id uuid primary key default gen_random_uuid(),
   submitter_id uuid not null references public.profiles(id) on delete restrict,
@@ -15,6 +18,7 @@ create table public.level_submissions (
   description text not null check (char_length(trim(description)) between 1 and 4000),
   thumbnail_url text not null check (thumbnail_url ~ '^https://'),
   difficulty text not null default 'Extreme Demon' check (char_length(difficulty) between 1 and 60),
+  minimum_record_percent smallint not null default 100 check (minimum_record_percent between 1 and 100),
   status public.level_submission_status not null default 'pending',
   review_reason text check (review_reason is null or char_length(review_reason) <= 2000),
   reviewed_by uuid references auth.users(id) on delete set null,
@@ -24,6 +28,28 @@ create table public.level_submissions (
 );
 
 create index level_submissions_review_idx on public.level_submissions(status, created_at) where status in ('pending','needs_evidence');
+
+create or replace function private.validate_record_submission()
+returns trigger language plpgsql set search_path = '' as $$
+declare required_progress smallint;
+begin
+  if new.raw_footage_url is null or new.raw_footage_url !~ '^https://' then
+    raise exception 'A shareable HTTPS raw-footage URL is required';
+  end if;
+  if new.completion_percent is null or new.completion_percent < 1 or new.completion_percent > 100 then
+    raise exception 'Progress must be between 1 and 100 percent';
+  end if;
+  select l.minimum_record_percent into required_progress
+    from public.levels l where l.id = new.level_id and l.status = 'ranked';
+  if not found then raise exception 'Only currently ranked levels accept records'; end if;
+  if new.completion_percent < required_progress then
+    raise exception 'This level requires at least % percent progress', required_progress;
+  end if;
+  return new;
+end;
+$$;
+create trigger validate_record_submission before insert on public.record_submissions
+  for each row execute function private.validate_record_submission();
 create index level_submissions_submitter_idx on public.level_submissions(submitter_id, created_at desc);
 create unique index one_active_level_submission_per_game_id on public.level_submissions(game_level_id) where status in ('pending','needs_evidence','accepted');
 
@@ -66,6 +92,14 @@ create policy "staff review level proposals"
   with check (
     (select private.has_role(array['moderator','administrator']::public.app_role[]))
     and status in ('pending','needs_evidence','accepted','rejected','withdrawn')
+    and reviewed_by = (select auth.uid())
+  );
+
+create policy "staff review own identity for records" on public.record_submissions
+  as restrictive for update to authenticated using (true)
+  with check (
+    (reviewed_by = (select auth.uid()) and (select private.has_role(array['moderator','administrator']::public.app_role[])))
+    or (player_id = (select auth.uid()) and status = 'withdrawn' and reviewed_by is null)
   );
 
 create policy "public read points ledger"
@@ -99,11 +133,11 @@ begin
 
     insert into public.levels (
       rank, name, level_id, verifier, difficulty, description,
-      status, video_url, thumbnail_url, added_by, date_verified
+      status, video_url, thumbnail_url, added_by, date_verified, minimum_record_percent
     ) values (
       next_rank, new.level_name, new.game_level_id, new.verifier_name,
       new.difficulty, new.description, 'ranked', new.verification_video_url,
-      new.thumbnail_url, new.submitter_id, now()
+      new.thumbnail_url, new.submitter_id, now(), new.minimum_record_percent
     ) returning id into created_level_id;
 
     foreach creator in array new.creators loop
@@ -166,7 +200,8 @@ left join public.points_ledger pl on pl.player_id = p.id
 group by p.id, p.username;
 
 grant select on public.level_submissions to authenticated;
-grant insert(submitter_id,level_name,game_level_id,creators,verifier_name,verification_video_url,description,thumbnail_url,difficulty,status) on public.level_submissions to authenticated;
+grant insert(submitter_id,level_name,game_level_id,creators,verifier_name,verification_video_url,description,thumbnail_url,difficulty,minimum_record_percent,status) on public.level_submissions to authenticated;
+grant insert(player_id,level_id,video_url,raw_footage_url,player_notes,completion_percent,status) on public.record_submissions to authenticated;
 grant update(status,review_reason,reviewed_by,reviewed_at) on public.level_submissions to authenticated;
 grant select on public.points_ledger, public.player_points to anon, authenticated;
 grant insert on public.points_ledger to authenticated;
