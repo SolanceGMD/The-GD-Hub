@@ -63,9 +63,9 @@ create table public.points_ledger (
   description text not null check (char_length(description) between 1 and 240),
   created_at timestamptz not null default now(),
   check (
-    (event_type = 'completion' and record_submission_id is not null and level_submission_id is null and points = 1)
+    (event_type = 'completion' and record_submission_id is not null and level_submission_id is null and points > 0)
     or
-    (event_type = 'verification' and level_submission_id is not null and record_submission_id is null and points = 5)
+    (event_type = 'verification' and level_submission_id is not null and record_submission_id is null and points > 0)
   )
 );
 create unique index one_completion_point_per_record on public.points_ledger(record_submission_id) where record_submission_id is not null;
@@ -122,6 +122,7 @@ declare
   created_level_id uuid;
   next_rank integer;
   creator text;
+  verifier_profile_id uuid;
 begin
   if new.status = 'accepted' and old.status is distinct from 'accepted' then
     if exists (select 1 from public.levels l where l.level_id = new.game_level_id) then
@@ -148,9 +149,17 @@ begin
       end if;
     end loop;
 
-    insert into public.points_ledger(player_id, event_type, points, level_submission_id, description)
-    values (new.submitter_id, 'verification', 5, new.id, 'Level verification approved: ' || new.level_name)
-    on conflict do nothing;
+    select p.id into verifier_profile_id
+      from public.profiles p
+      where lower(p.username) = lower(trim(new.verifier_name))
+      limit 1;
+
+    if verifier_profile_id is not null then
+      insert into public.points_ledger(player_id, event_type, points, level_submission_id, description)
+      values (verifier_profile_id, 'verification', greatest(1, 151 - next_rank), new.id,
+        'Level verification approved: ' || new.level_name)
+      on conflict do nothing;
+    end if;
 
     insert into public.moderation_actions(actor_id, target_user_id, level_id, action, reason, metadata)
     values (new.reviewed_by, new.submitter_id, created_level_id, 'level_created', new.review_reason,
@@ -172,11 +181,16 @@ set search_path = ''
 as $$
 declare
   level_name text;
+  level_rank integer;
+  earned_points integer;
 begin
   if new.status = 'accepted' and old.status is distinct from 'accepted' then
-    select l.name into level_name from public.levels l where l.id = new.level_id;
+    select l.name, l.rank into level_name, level_rank
+      from public.levels l where l.id = new.level_id;
+    earned_points := greatest(1, floor((151 - coalesce(level_rank, 150)) * coalesce(new.completion_percent, 100) / 100.0)::integer);
     insert into public.points_ledger(player_id, event_type, points, record_submission_id, description)
-    values (new.player_id, 'completion', 1, new.id, 'Accepted completion: ' || coalesce(level_name, 'ranked level'))
+    values (new.player_id, 'completion', earned_points, new.id,
+      'Accepted ' || coalesce(new.completion_percent::text, '100') || '% completion: ' || coalesce(level_name, 'ranked level'))
     on conflict do nothing;
   end if;
   return new;
