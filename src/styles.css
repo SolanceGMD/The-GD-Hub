@@ -149,3 +149,27 @@
   .level-table .level-row>span:nth-child(4){display:none}
   .detail-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+
+/* Accessibility: strengthen text contrast across the light Pointercrate-style pages. */
+.back-link{color:#405a70}
+.page-hero p{color:#465563}
+.result-count{color:#4f5f6e}
+.detail-sub{color:#586675}
+.detail-rank{color:#586675}
+.detail-facts small{color:#526273}
+.detail-card>p:not(.detail-sub){color:#d0d7e0}
+.form-hint{color:#536273}
+.form-foot>span{color:#536273}
+.optional{color:#526273}
+.record-row>div small{color:#536273}
+.info-card p{color:#536273}
+.quiet-copy{color:#536273}
+.policy-note{color:#595a46}
+.pointer-home .pointer-stats{color:#4f5d6b}
+.pointer-home .pointer-list-heading p,.pointer-home .pointer-help p{color:#4e5c6a}
+.footer-inner>span{color:#586675}
+.footer .brand-copy small{color:#586675}
+@media(max-width:760px){
+  .page-hero p,.detail-sub,.form-hint,.record-row>div small,.info-card p{color:#465563}
+}
