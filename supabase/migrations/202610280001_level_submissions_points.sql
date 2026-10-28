@@ -1,5 +1,5 @@
 -- Add level proposals, review workflow, and auditable player points.
--- Point policy: +5 for an approved level verification; +1 for each accepted completion.
+-- Points are rank-weighted: completions scale by level rank and progress; verifications scale by rank.
 -- Points are awarded only by database triggers after staff approval, never by client-supplied values.
 
 create type public.level_submission_status as enum ('pending','needs_evidence','accepted','rejected','withdrawn');
