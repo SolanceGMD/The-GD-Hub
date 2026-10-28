@@ -71,3 +71,33 @@
  .pointer-stats{gap:12px 18px}
  .header.wrap{padding:0 17px}
 }
+
+/* Level proposal, verification and points UI */
+.level-name{flex-direction:row;align-items:center;gap:11px}
+.level-name-copy{display:flex;flex-direction:column;gap:4px;min-width:0}
+.level-thumb{width:66px;height:38px;flex-shrink:0;object-fit:cover;border:1px solid #d4dbe2;border-radius:2px;background:#edf1f5}
+.pointer-home .level-thumb{width:58px;height:34px}
+.detail-thumbnail{display:block;width:min(480px,100%);max-height:270px;object-fit:cover;margin:22px 0;border:1px solid #d4dbe2;border-radius:3px;background:#edf1f5}
+.points-table .level-row{grid-template-columns:60px minmax(150px,2fr) minmax(70px,.7fr) minmax(90px,.9fr) minmax(95px,.9fr)}
+.points-total{color:#2c5b83;font-size:16px}
+.review-card{display:flex;gap:17px;padding:18px;margin:13px 0;border:1px solid #d2d8df;background:#fff}
+.review-thumb{width:160px;height:100px;object-fit:cover;flex-shrink:0;border:1px solid #d2d8df}
+.review-body{flex:1;min-width:0}
+.review-body h3{margin:0 0 8px;color:#2b4056;font-size:17px}
+.review-body h3 small{font-size:12px;font-weight:400;color:#73808d}
+.review-body p{font-size:12px;line-height:1.65;color:#596674;margin:7px 0}
+.review-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.review-actions button{border:1px solid #cbd5de;border-radius:3px;background:#f4f7f9;color:#34536f;padding:8px 11px;font-size:11px;cursor:pointer}
+.review-actions button:first-child{background:#e8f2e9;border-color:#c4ddc8;color:#285b35}
+.review-actions button:last-child{color:#9b3943}
+.review-actions button:disabled{opacity:.5;cursor:wait}
+.quiet-copy{color:#6b7783;font-size:12px;padding:8px 0 20px}
+.form-card select{font:12px Inter,Arial,sans-serif}
+@media(max-width:760px){
+ .level-thumb{width:52px;height:32px}
+ .pointer-home .level-thumb{width:45px;height:29px}
+ .points-table .table-head,.points-table .level-row{grid-template-columns:38px minmax(100px,1fr) 48px;gap:7px;padding:0 8px}
+ .points-table .table-head span:nth-child(4),.points-table .table-head span:nth-child(5),.points-table .level-row>span:nth-child(4),.points-table .level-row>span:nth-child(5){display:none}
+ .review-card{display:block;padding:13px}
+ .review-thumb{width:100%;height:145px;margin-bottom:12px}
+}
