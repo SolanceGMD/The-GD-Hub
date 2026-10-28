@@ -151,25 +151,27 @@
 }
 
 
-/* Accessibility: strengthen text contrast across the light Pointercrate-style pages. */
-.back-link{color:#405a70}
+/* Contrast fixes: dark panels must use light text; light Pointercrate panels use dark text. */
+.back-link{color:#2f6f9f}
 .page-hero p{color:#465563}
 .result-count{color:#4f5f6e}
-.detail-sub{color:#586675}
-.detail-rank{color:#586675}
-.detail-facts small{color:#526273}
+.detail-sub,.detail-rank{color:#c0cad5}
+.detail-facts small{color:#b8c4d0}
 .detail-card>p:not(.detail-sub){color:#d0d7e0}
-.form-hint{color:#536273}
-.form-foot>span{color:#536273}
-.optional{color:#526273}
-.record-row>div small{color:#536273}
-.info-card p{color:#536273}
-.quiet-copy{color:#536273}
-.policy-note{color:#595a46}
+.form-hint,.form-foot>span,.optional{color:#aeb9c6}
+.record-row>div small{color:#b2bdc9}
+.info-card p{color:#b2bdc9}
+.quiet-copy{color:#b2bdc9}
+.policy-note{color:#c8c5b3}
 .pointer-home .pointer-stats{color:#4f5d6b}
 .pointer-home .pointer-list-heading p,.pointer-home .pointer-help p{color:#4e5c6a}
-.footer-inner>span{color:#586675}
-.footer .brand-copy small{color:#586675}
+.footer-inner>span,.footer .brand-copy small{color:#586675}
+.profile-link{color:#4e9bd0;text-decoration:none}
+.profile-link:hover,.profile-level-link:hover{text-decoration:underline}
+.record-row .profile-link{color:#8bd9ff}
+.profile-level-link{color:#5e9dc9;text-decoration:none}
 @media(max-width:760px){
-  .page-hero p,.detail-sub,.form-hint,.record-row>div small,.info-card p{color:#465563}
+  .page-hero p,.form-hint,.record-row>div small,.info-card p{color:#b2bdc9}
+  .page-hero p{color:#465563}
+  .detail-sub,.form-hint,.optional,.form-foot>span{color:#b2bdc9}
 }
