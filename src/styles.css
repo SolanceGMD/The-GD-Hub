@@ -113,3 +113,22 @@
 .profile-score small{font-size:10px;letter-spacing:.06em;color:#697684}
 .profile-score strong{font-size:20px;color:#2e4d69;overflow-wrap:anywhere}
 @media(max-width:760px){.record-thumb{width:48px;height:32px}.level-records .section-heading{align-items:flex-start;flex-direction:column}.profile-score>span{flex:1;min-width:130px}}
+
+/* Final Pointercrate-inspired compact table treatment */
+.level-table .table-head,.level-table .level-row{grid-template-columns:52px minmax(190px,2fr) minmax(105px,.9fr) 70px minmax(100px,.9fr) 18px;gap:10px;padding:0 12px}
+.level-table .table-head{background:#edf2f6;color:#687887;border-bottom:1px solid #d9e0e6}
+.level-table .level-row{background:#fff;color:#293744;border-top:1px solid #e0e5ea;min-height:61px}
+.level-table .level-row:hover{background:#f5f8fa}
+.level-table .rank{color:#2e4d69;font-size:17px}
+.level-table .level-name strong{color:#293744}
+.level-table .level-name small{color:#778492}
+.level-table .level-row>span:nth-child(3){color:#596b7b}
+.level-table .verifier{color:#536b80}
+.level-points{font-size:12px;color:#2e4d69;font-variant-numeric:tabular-nums}
+.level-table .row-arrow{color:#8a9aa8}
+.level-table .level-row:hover .row-arrow{color:#2e4d69}
+@media(max-width:760px){
+ .level-table .table-head,.level-table .level-row{grid-template-columns:38px minmax(110px,1fr) 16px;gap:7px;padding:0 8px}
+ .level-table .table-head span:nth-child(3),.level-table .table-head span:nth-child(4),.level-table .table-head span:nth-child(5),.level-table .level-row>span:nth-child(3),.level-table .level-row>.level-points,.level-table .level-row>span:nth-child(5){display:none}
+ .level-table .level-thumb{width:48px;height:30px}
+}
