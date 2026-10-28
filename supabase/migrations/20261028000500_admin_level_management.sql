@@ -92,6 +92,7 @@ begin
   end if;
   select * into l from public.levels where id=p_level_id and status='published';
   if not found then raise exception 'Published level not found'; end if;
+  update public.levels set admin_hidden = true where id = p_level_id;
   if l.verifier is not null then
     select id into v_verifier_id from public.profiles where lower(gd_username)=lower(l.verifier) limit 1;
   end if;
@@ -108,5 +109,51 @@ end;
 $function$;
 revoke all on function public.wcl_admin_resubmit_level(uuid) from public, anon;
 grant execute on function public.wcl_admin_resubmit_level(uuid) to authenticated;
+
+
+-- Resubmitted levels are hidden while pending; permit the replacement to reuse the same GD ID.
+create or replace function public.wcl_review_level_submission(
+  p_submission_id uuid, p_status text, p_points integer, p_note text default null
+)
+returns uuid language plpgsql security definer set search_path = ''
+as $function$
+declare s public.level_submissions%rowtype; v_level_id uuid; v_run_id uuid; v_verifier_name text;
+begin
+  if auth.uid() is null or not wcl_private.has_permission('submissions.review') then
+    raise exception 'Missing permission: submissions.review' using errcode = '42501';
+  end if;
+  if p_status not in ('approved','rejected','needs_evidence') then raise exception 'Invalid review status'; end if;
+  if p_points is null or p_points < 0 or p_points > 1000000 then raise exception 'Invalid points'; end if;
+  if p_note is not null and char_length(p_note) > 1000 then raise exception 'Review note is too long'; end if;
+  select * into s from public.level_submissions where id=p_submission_id for update;
+  if not found or s.status not in ('pending','needs_evidence') then raise exception 'Pending level submission not found'; end if;
+  if p_status='approved' then
+    if s.gd_level_id is not null and exists (
+      select 1 from public.levels l where l.gd_level_id=s.gd_level_id and l.status='published' and not l.admin_hidden
+    ) then raise exception 'A visible published level already uses Geometry Dash ID %', s.gd_level_id; end if;
+    select p.gd_username into v_verifier_name from public.profiles p where p.id=s.verified_by;
+    insert into public.levels(
+      name, gd_level_id, creator, description, points, difficulty, length,
+      youtube_url, status, created_by, thumbnail_url, minimum_record_percent, verifier
+    ) values (
+      s.name, s.gd_level_id, s.creator, s.description, p_points, s.difficulty, s.length,
+      s.youtube_url, 'published', s.submitter_id, s.thumbnail_url, s.minimum_record_percent, v_verifier_name
+    ) returning id into v_level_id;
+    if s.verified_by is not null then
+      insert into public.completion_submissions(
+        submitter_id, level_id, proof_url, status, points_awarded, reviewer_id, review_note,
+        reviewed_at, verification_submission_id, progress_percent, raw_footage_url, player_notes
+      ) values(s.verified_by,v_level_id,null,'pending',0,null,null,null,s.id,100,null,null)
+      returning id into v_run_id;
+      update public.completion_submissions set status='approved',reviewer_id=auth.uid(),reviewed_at=now() where id=v_run_id;
+    end if;
+  end if;
+  update public.level_submissions set status=p_status, reviewer_id=auth.uid(), reviewed_at=now(),
+    review_note=nullif(trim(p_note),'') where id=p_submission_id;
+  return v_level_id;
+end;
+$function$;
+revoke all on function public.wcl_review_level_submission(uuid,text,integer,text) from public, anon;
+grant execute on function public.wcl_review_level_submission(uuid,text,integer,text) to authenticated;
 
 commit;
