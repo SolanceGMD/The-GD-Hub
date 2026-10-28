@@ -132,3 +132,20 @@
  .level-table .table-head span:nth-child(3),.level-table .table-head span:nth-child(4),.level-table .table-head span:nth-child(5),.level-table .level-row>span:nth-child(3),.level-table .level-row>.level-points,.level-table .level-row>span:nth-child(5){display:none}
  .level-table .level-thumb{width:48px;height:30px}
 }
+
+/* The Demon List ranks levels by placement and points; no separate difficulty rating. */
+.level-table .table-head,.level-table .level-row{
+  grid-template-columns:52px minmax(190px,2fr) 70px minmax(100px,.9fr) 18px;
+}
+.detail-facts{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:760px){
+  .level-table .table-head,.level-table .level-row{
+    grid-template-columns:38px minmax(110px,1fr) 16px;
+  }
+  .level-table .table-head span:nth-child(3),
+  .level-table .table-head span:nth-child(4),
+  .level-table .table-head span:nth-child(5),
+  .level-table .level-row>.level-points,
+  .level-table .level-row>span:nth-child(4){display:none}
+  .detail-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
