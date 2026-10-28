@@ -18,6 +18,10 @@ jobs:
           node-version: 22
       - run: npm install --package-lock-only
       - run: npm ci
+      - name: Diagnose remaining npm advisories
+        run: |
+          npm audit --json > audit-report.json || true
+          node -e "const a=require('./audit-report.json'); console.log(JSON.stringify(Object.entries(a.vulnerabilities||{}).map(([name,v])=>({name,severity:v.severity,via:v.via.map(x=>typeof x==='string'?x:x.title),range:v.range,fixAvailable:v.fixAvailable})),null,2))"
       - run: npm run build
         env:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
