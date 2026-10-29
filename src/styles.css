@@ -175,3 +175,32 @@
   .page-hero p{color:#465563}
   .detail-sub,.form-hint,.optional,.form-foot>span{color:#b2bdc9}
 }
+
+
+/* Unverified List: progress-focused board, explicitly separate from scored records. */
+.unverified-promo{margin-top:24px;border-top:1px solid #d9dde2;padding-top:22px}
+.unverified-promo-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:14px;padding:13px 15px;background:#f0f4f7;border:1px solid #d9e0e6}
+.unverified-promo-actions>span{display:flex;align-items:center;gap:8px;color:#4b6072;font-size:12px}
+.unverified-rules{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.unverified-rules>span{display:flex;flex-direction:column;gap:4px;min-width:115px;padding:12px 15px;border:1px solid #d8e0e7;background:#f3f6f8;color:#5e6e7c;font-size:11px}
+.unverified-rules strong{font-size:17px;color:#2e4d69}
+.unverified-list{display:flex;flex-direction:column;gap:10px}
+.unverified-card{display:grid;grid-template-columns:48px minmax(0,1fr) 145px;align-items:center;gap:15px;padding:17px 18px;background:#fff;border:1px solid #d8dfe6;border-radius:3px}
+.unverified-place{font-size:17px;font-weight:700;color:#7890a4;font-variant-numeric:tabular-nums}
+.unverified-main{min-width:0}
+.unverified-main h3{margin:0 0 5px;color:#293e50;font-size:16px}
+.unverified-main p{margin:4px 0;color:#5c6c79;font-size:12px}
+.unverified-main small{color:#7a8792;font-size:11px}
+.unverified-main .unverified-notes{margin-top:8px;color:#596674;overflow-wrap:anywhere}
+.unverified-score{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.unverified-score strong{font-size:27px;line-height:1;color:#2e4d69;font-variant-numeric:tabular-nums}
+.unverified-score span{font-size:9px;letter-spacing:.07em;color:#73818e}
+.unverified-score .text-link{font-size:11px}
+.unverified-footnote{margin:18px 0;color:#697887;font-size:11px;line-height:1.6}
+@media(max-width:620px){
+ .unverified-promo-actions{align-items:flex-start;flex-direction:column}
+ .unverified-card{grid-template-columns:32px minmax(0,1fr);gap:10px;padding:13px}
+ .unverified-score{grid-column:2;align-items:flex-start;flex-direction:row;align-items:center;gap:10px;flex-wrap:wrap;padding-top:5px;border-top:1px solid #e1e6eb}
+ .unverified-score strong{font-size:22px}
+ .unverified-rules>span{flex:1;min-width:90px}
+}
