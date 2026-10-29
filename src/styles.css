@@ -250,3 +250,10 @@
 :root[data-theme="light"] .theme-option small{color:#6d7b89}
 :root[data-theme="light"] .theme-option.selected{background:#edf5fa;border-color:#3f779d}
 @media(max-width:760px){:root[data-theme="light"] .header>.nav.nav-open{background:#f6f8fa;border-color:#d5dde4}:root[data-theme="light"] .header .nav-link{border-color:#e0e6eb}}
+
+.public-player-banner{display:flex;align-items:center;gap:22px;padding:24px;margin:20px 0;background-color:#233a4d;background-size:cover;background-position:center;color:#fff;border:1px solid #d5dde4;min-height:190px}
+.public-player-banner h1{font:800 clamp(34px,5vw,54px)/1 'Barlow Condensed',sans-serif;margin:10px 0;color:#fff}
+.public-player-banner h1 span{color:var(--cyan)}
+.public-player-banner p{color:#e2e9ef;margin:0;max-width:650px;overflow-wrap:anywhere}
+:root[data-theme="light"] .public-player-banner p{color:#e2e9ef}
+@media(max-width:620px){.public-player-banner{align-items:flex-start;flex-direction:column;padding:18px}.public-player-avatar{width:70px;height:70px}}
