@@ -257,3 +257,103 @@
 .public-player-banner p{color:#e2e9ef;margin:0;max-width:650px;overflow-wrap:anywhere}
 :root[data-theme="light"] .public-player-banner p{color:#e2e9ef}
 @media(max-width:620px){.public-player-banner{align-items:flex-start;flex-direction:column;padding:18px}.public-player-avatar{width:70px;height:70px}}
+
+
+/* Header/nav stability patch: keep top controls in their own predictable layout. */
+.header.wrap{
+  position:relative;
+  z-index:30;
+  height:auto;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  column-gap:16px;
+  row-gap:0;
+  padding-top:12px;
+  padding-bottom:0;
+}
+.header>.brand{min-width:0;flex:0 1 auto}
+.header>.nav{
+  order:3;
+  flex:1 0 100%;
+  width:100%;
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  flex-wrap:wrap;
+  gap:5px;
+  padding:10px 0 12px;
+  margin-top:10px;
+  border-top:1px solid #dce2e7;
+}
+.header .nav-link{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:34px;
+  line-height:1.25;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+.header .login-button,.header .account-button{
+  flex:0 0 auto;
+  min-height:34px;
+  line-height:1.2;
+  white-space:nowrap;
+}
+.header .mobile-toggle{flex:0 0 auto;align-self:center;position:relative;z-index:32}
+@media(max-width:760px){
+  .header.wrap{
+    height:70px;
+    min-height:70px;
+    flex-wrap:nowrap;
+    padding-top:0;
+    padding-bottom:0;
+    column-gap:10px;
+  }
+  .header>.brand{flex:1 1 auto;min-width:0}
+  .header .brand-copy strong{font-size:16px}
+  .header .brand-copy small{font-size:7px}
+  .header .brand-mark{width:36px;height:36px;flex:0 0 36px}
+  .header>.nav{
+    order:initial;
+    flex:none;
+    width:auto;
+    min-width:0;
+    display:none;
+    position:absolute;
+    top:100%;
+    left:0;
+    right:0;
+    margin-top:0;
+    padding:12px 18px 18px;
+    background:#2e4d69;
+    border:1px solid #20394f;
+    border-top:0;
+    box-shadow:0 14px 28px #0003;
+    z-index:31;
+    align-items:stretch;
+    gap:0;
+  }
+  .header>.nav.nav-open{display:flex;flex-direction:column}
+  .header .nav-link{
+    width:100%;
+    min-height:42px;
+    justify-content:flex-start;
+    padding:11px 6px;
+    border-bottom:1px solid #ffffff1c;
+    font-size:13px;
+  }
+  .header .login-button,.header .account-button{
+    width:100%;
+    justify-content:center;
+    margin:12px 0 0;
+    min-height:40px;
+  }
+  .header .mobile-toggle{display:grid;place-items:center;padding:8px}
+  :root[data-theme="light"] .header>.nav.nav-open{background:#f6f8fa;border-color:#d5dde4}
+  :root[data-theme="light"] .header .nav-link{border-color:#e0e6eb}
+}
