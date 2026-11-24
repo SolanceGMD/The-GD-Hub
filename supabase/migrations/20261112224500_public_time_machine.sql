@@ -12,18 +12,32 @@ as $$
   with latest as (
     select distinct on (a.target_id)
       a.target_id,
-      a.details -> 'after' as snapshot
+      a.action,
+      coalesce(a.details -> 'after', a.details -> 'before') as snapshot
     from public.audit_logs a
     where a.target_type = 'levels'
-      and a.action in ('insert','update')
+      and a.action in ('insert','update','delete')
       and a.created_at <= p_as_of
       and a.target_id is not null
-      and a.details ? 'after'
     order by a.target_id, a.created_at desc, a.id desc
+  ),
+  visible as (
+    select snapshot
+    from latest
+    where latest.action <> 'delete'
+      and snapshot ->> 'status' = 'published'
+      and coalesce((snapshot ->> 'admin_hidden')::boolean,false) = false
+  ),
+  ranked as (
+    select
+      (snapshot ->> 'id')::uuid as id,
+      row_number() over (order by coalesce(nullif(snapshot ->> 'sort_order','')::integer,0), snapshot ->> 'name')::integer as rank,
+      snapshot
+    from visible
   )
   select
-    (snapshot ->> 'id')::uuid,
-    coalesce(nullif(snapshot ->> 'sort_order','')::integer, 0),
+    id,
+    rank,
     snapshot ->> 'name',
     coalesce(snapshot ->> 'gd_level_id','—'),
     snapshot ->> 'creator',
@@ -34,10 +48,8 @@ as $$
     snapshot ->> 'thumbnail_url',
     coalesce(nullif(snapshot ->> 'minimum_record_percent','')::integer,100),
     snapshot ->> 'youtube_url'
-  from latest
-  where snapshot ->> 'status' = 'published'
-    and coalesce((snapshot ->> 'admin_hidden')::boolean,false) = false
-  order by coalesce(nullif(snapshot ->> 'sort_order','')::integer,0), snapshot ->> 'name'
+  from ranked
+  order by rank
   limit 300;
 $$;
 
